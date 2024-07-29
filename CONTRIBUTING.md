@@ -10,6 +10,7 @@ Thank you for considering contributing to FinTrack! Your contributions help make
     <li><a href="#license">License</a></li>
     <li><a href="#how-to-file-a-bug-report">How to File a Bug Report</a></li>
     <li><a href="#how-to-suggest-a-new-feature">How to Suggest a New Feature</a></li>
+    <li><a href="#how-to-submit-a-new-documentation">How to Submit a New Documentation</a></li>
     <li><a href="#how-to-submit-a-pull-request">How to Submit a Pull Request</a></li>
     <li><a href="#issue-approval-process">Issue Approval Process</a></li>
     <li><a href="#pull-request-approval-process">Pull Request Approval Process</a></li>
@@ -33,7 +34,7 @@ By contributing, you agree that your contributions will be licensed under its [M
 ## How to File a Bug Report
 To file a bug report, please follow these steps:
 1. **Search for existing issues**: Before creating a new issue, please check if it already exists.
-2. **Open a new issue**: If the bug hasn't been reported, create a  <a href="https://github.com/shyke0611/dcd/issues/new?labels=bug&template=bug_report.md">Report Bug</a> and include the following information:
+2. **Open a new issue**: If the bug hasn't been reported, create a   <a href="https://github.com/310Team8/FinTrack/issues/new?labels=bug&template=bug_report.md">Report Bug</a> and include the following information:
    - **Summary**: A clear and descriptive title with a brief summary of the bug.
    - **Steps to Reproduce**: Steps to reproduce the issue.
    - **Expected Behaviour**: What you expected to happen.
@@ -44,11 +45,20 @@ To file a bug report, please follow these steps:
 ## How to Suggest a New Feature
 To suggest a new feature, please follow these steps:
 1. **Search for existing feature requests**: Check if the feature has already been suggested.
-2. **Open a new issue**: If the feature hasn't been requested, create a <a href="https://github.com/shyke0611/dcd//issues/new?labels=enhancement&template=feature_request.md">Request Feature</a> and include the following information:
+2. **Open a new issue**: If the feature hasn't been requested, create a <a href="https://github.com/310Team8/FinTrack/issues/new?labels=enhancement&template=feature_request.md">Request Feature</a> and include the following information:
    - **Summary**: A clear and descriptive title and the summary of the feature.
    - **Description**: A detailed description of the feature.
    - **Problem**: The problem the feature solves.
    - **Examples/Use Cases**: Any relevant examples or use cases.
+
+## How to Submit a New Documentation
+To suggest new documentation, please follow these steps:
+1. **Search for existing documentation requests**: Check if the documentation has already been requested.
+2. **Open a new issue**: If the documentation hasn't been requested, create a <a href="https://github.com/310Team8/FinTrack/issues/new?labels=documentation&template=documentation_request.md">Request Documention</a> and include the following information:
+   - **Summary**: A clear and descriptive title and the summary of the documentation needed.
+   - **Description**: A detailed description of the documentation required.
+   - **Problem**: The problem the documentation addresses.
+   - **Examples/Use Cases**: Any relevant examples or use cases where the documentation would be useful.
 
 ## How to Submit a Pull Request
 To submit a pull request (PR), follow these steps:
