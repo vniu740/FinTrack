@@ -12,6 +12,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.example.views.DashboardView;
+import org.vaadin.example.views.AssetView;
 import org.vaadin.example.views.BudgetView;
 import org.vaadin.example.views.ExpenseView;
 import org.vaadin.example.views.IncomeView;
@@ -78,8 +79,13 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         Button dashboardButton = new Button("Dashboard");
         dashboardButton.addClickListener(e -> dashboardButton.getUI().ifPresent(ui -> ui.navigate(DashboardView.class)));
 
+        Button assetButton = new Button("Assets");
+        assetButton.addClickListener(e -> assetButton.getUI().ifPresent(ui -> ui.navigate(AssetView.class)));
 
-       HorizontalLayout header = new HorizontalLayout(logo, dashboardButton, budgetButton, expenseButton, incomeButton, goalButton, logoutButton);
+
+
+
+       HorizontalLayout header = new HorizontalLayout(logo, dashboardButton, budgetButton, expenseButton, incomeButton, assetButton, goalButton, logoutButton);
        header.expand(logo);
        header.setWidthFull();
        header.setAlignItems(Alignment.CENTER);
@@ -100,6 +106,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
        RouterLink incomeLink = new RouterLink("Manage Income", IncomeView.class);
        RouterLink goalLink = new RouterLink("Manage Goals", FinancialGoalView.class);
        RouterLink categoryLink = new RouterLink("Manage Categories", ExpenseCategoryView.class);
+       RouterLink assetLink = new RouterLink("Manage Assets", AssetView.class);
 
 
        VerticalLayout drawerLayout = new VerticalLayout(
@@ -108,7 +115,8 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
            expenseLink,
            incomeLink,
            goalLink,
-           categoryLink
+           categoryLink,
+           assetLink
        );
       
        drawerLayout.setAlignItems(Alignment.STRETCH);

@@ -148,7 +148,7 @@ To set up Maven:
 
 7. **Run the Project**:
    ```sh
-   mvn spring-boot:run
+   mvn clean spring-boot:run 
    ```
   Alternatively, you can open Application.java in your IDE (such as IntelliJ IDEA or VS Code) and press the "Run" button to start the application.
   Once the application is running, your web browser should open automatically. If not, open a new browser window and type http://localhost:8080 to access the application.
