@@ -48,6 +48,23 @@ public class FinancialGoalService {
     }
 
     /**
+     * Updates an existing financial goal in the repository.
+     *
+     * @param financialGoal the financial goal object with updated data
+     * @return the updated financial goal object
+     */
+    public FinancialGoal updateFinancialGoal(FinancialGoal financialGoal) {
+        FinancialGoal existingGoal = findFinancialGoalById(financialGoal.getId());
+        if (existingGoal != null) {
+            existingGoal.setSavedAmount(financialGoal.getSavedAmount());
+            existingGoal.setTargetAmount(financialGoal.getTargetAmount());
+            existingGoal.setDescription(financialGoal.getDescription());
+            return financialGoalRepository.save(existingGoal);
+        }
+        return null;
+    }
+
+    /**
      * Deletes a financial goal by its ID.
      *
      * @param id the ID of the financial goal to be deleted
