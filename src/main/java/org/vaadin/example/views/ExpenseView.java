@@ -58,6 +58,7 @@ public class ExpenseView extends VerticalLayout {
     private final TextField amountField = new TextField("Amount");
     private final DatePicker datePicker = new DatePicker("Date");
     private final ComboBox<Budget> budgetComboBox = new ComboBox<>("Select Budget");
+    private final ComboBox<String> frequencyField = new ComboBox<>("Payment Frequency");
 
     private final ExpenseService expenseService;
     private final SessionService sessionService;
@@ -90,7 +91,7 @@ public class ExpenseView extends VerticalLayout {
         Button addButton = new Button("Add/Update Expense", event -> addOrUpdateExpense());
         Button deleteButton = new Button("Delete Expense", event -> deleteExpense());
     
-        HorizontalLayout formLayout = new HorizontalLayout(descriptionField, amountField, datePicker, budgetComboBox, addButton, deleteButton);
+        HorizontalLayout formLayout = new HorizontalLayout(descriptionField, amountField, datePicker, budgetComboBox, frequencyField, addButton, deleteButton);
         formLayout.setWidthFull();
         formLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.END);
     
@@ -116,7 +117,7 @@ public class ExpenseView extends VerticalLayout {
      */
 
     private void configureGrid() {
-        grid.setColumns("description", "amount", "date");
+        grid.setColumns("description", "amount", "date", "paymentFrequency");
 
         
         grid.addColumn(expense -> {
@@ -139,6 +140,9 @@ public class ExpenseView extends VerticalLayout {
         descriptionField.setPlaceholder("e.g., Groceries");
         amountField.setPlaceholder("e.g., 200.00");
         datePicker.setPlaceholder("Select a date");
+
+        frequencyField.setItems("One-off", "Weekly", "Biweekly", "Monthly");
+        frequencyField.setPlaceholder("Select payment frequency");
     }
 
     /**
@@ -173,16 +177,17 @@ public class ExpenseView extends VerticalLayout {
         BigDecimal amount = new BigDecimal(amountText);
         LocalDate date = datePicker.getValue();
         Budget selectedBudget = budgetComboBox.getValue();
+        String paymentFrequency = frequencyField.getValue();
 
-        if (description.isEmpty() || amount.compareTo(BigDecimal.ZERO) <= 0 || date == null) {
+        if (description.isEmpty() || amount.compareTo(BigDecimal.ZERO) <= 0 || date == null|| paymentFrequency == null) {
             Notification.show("Please fill in all required fields with valid data.");
             return;
         }
 
         if (selectedExpense == null) {
-            addExpense(description, amount, date, selectedBudget);
+            addExpense(description, amount, date, selectedBudget, paymentFrequency);
         } else {
-            updateExpense(selectedExpense, description, amount, date, selectedBudget);
+            updateExpense(selectedExpense, description, amount, date, selectedBudget, paymentFrequency);
         }
     }
 
@@ -194,11 +199,12 @@ public class ExpenseView extends VerticalLayout {
      * @param date the date of the expense
      * @param selectedBudget the budget associated with the expense
      */
-    private void addExpense(String description, BigDecimal amount, LocalDate date, Budget selectedBudget) {
+    private void addExpense(String description, BigDecimal amount, LocalDate date, Budget selectedBudget, String paymentFrequency) {
         Expense expense = new Expense();
         expense.setDescription(description);
         expense.setAmount(amount);
         expense.setDate(date != null ? java.sql.Date.valueOf(date) : null);
+        expense.setPaymentFrequency(paymentFrequency);
         expense.setUser(userService.findUserById(sessionService.getLoggedInUserId()));
         expense.setBudget(selectedBudget);
 
@@ -225,11 +231,12 @@ public class ExpenseView extends VerticalLayout {
      * @param date the updated date of the expense
      * @param selectedBudget the updated budget associated with the expense
      */
-    private void updateExpense(Expense expense, String description, BigDecimal amount, LocalDate date, Budget selectedBudget) {
+    private void updateExpense(Expense expense, String description, BigDecimal amount, LocalDate date, Budget selectedBudget, String paymentFrequency) {
         expense.setDescription(description);
         expense.setAmount(amount);
         expense.setDate(date != null ? java.sql.Date.valueOf(date) : null);
         expense.setBudget(selectedBudget);
+        expense.setPaymentFrequency(paymentFrequency);
 
         expenseService.updateExpense(expense);
         Notification.show("Expense updated successfully");
@@ -257,6 +264,7 @@ public class ExpenseView extends VerticalLayout {
         amountField.setValue(expense.getAmount().toString());
         datePicker.setValue(((Date) expense.getDate()).toLocalDate());
         budgetComboBox.setValue(expense.getBudget());
+        frequencyField.setValue(expense.getPaymentFrequency());
     }
 
     /**
@@ -289,6 +297,7 @@ public class ExpenseView extends VerticalLayout {
         amountField.clear();
         datePicker.clear();
         budgetComboBox.clear();
+        frequencyField.clear();
         selectedExpense = null;
     }
 

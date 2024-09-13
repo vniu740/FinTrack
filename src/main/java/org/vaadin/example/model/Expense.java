@@ -65,6 +65,13 @@ public class Expense {
     @JoinColumn(name = "budget_id")
     private Budget budget;
 
+    /**
+     * The payment frequency of the expense (e.g., weekly, monthly, one-off).
+     * Cannot be null.
+     */
+    @NotNull
+    private String paymentFrequency;
+
     // Getters and Setters
 
     /**
@@ -182,5 +189,23 @@ public class Expense {
 
     public void setBudget(Budget budget) {
         this.budget = budget;
+    }
+
+    /**
+     * Gets the payment frequency of the expense.
+     *
+     * @return the payment frequency of the expense
+     */
+    public String getPaymentFrequency() {
+        return paymentFrequency;
+    }
+
+    /**
+     * Sets the payment frequency of the expense.
+     *
+     * @param paymentFrequency the payment frequency to set
+     */
+    public void setPaymentFrequency(String paymentFrequency) {
+        this.paymentFrequency = paymentFrequency;
     }
 }
