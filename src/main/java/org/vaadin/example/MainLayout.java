@@ -11,15 +11,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.server.VaadinSession;
-import org.vaadin.example.views.DashboardView;
-import org.vaadin.example.views.AssetView;
-import org.vaadin.example.views.BudgetView;
-import org.vaadin.example.views.ExpenseView;
-import org.vaadin.example.views.IncomeView;
-import org.vaadin.example.views.FinancialGoalView;
-import org.vaadin.example.views.ExpenseCategoryView;
-import org.vaadin.example.views.LoginView;
-import org.vaadin.example.views.RegistrationView;
+import org.vaadin.example.views.*;
 
 /**
  * The MainLayout class serves as the primary layout for the application, providing a common
@@ -89,6 +81,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
        RouterLink goalLink = new RouterLink("Manage Goals", FinancialGoalView.class);
        RouterLink categoryLink = new RouterLink("Manage Categories", ExpenseCategoryView.class);
        RouterLink assetLink = new RouterLink("Manage Assets", AssetView.class);
+       RouterLink netCashflowForecastLink = new RouterLink("View Cashflow Forecast", NetCashflowForecastView.class);
 
 
        VerticalLayout drawerLayout = new VerticalLayout(
@@ -98,7 +91,8 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
            incomeLink,
            goalLink,
            categoryLink,
-           assetLink
+           assetLink,
+           netCashflowForecastLink
        );
       
        drawerLayout.setAlignItems(Alignment.STRETCH);

@@ -7,7 +7,9 @@ import org.vaadin.example.repository.ExpenseRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.Month;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * Service class for managing expense-related operations.
@@ -67,7 +69,7 @@ public class ExpenseService {
     public BigDecimal getTotalExpensesForCurrentMonth(Long userId) {
         LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
         LocalDate endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-       
+
         return expenseRepository.findTotalExpensesForPeriod(userId, startOfMonth, endOfMonth);
     }
 
@@ -93,5 +95,76 @@ public class ExpenseService {
         } else {
             throw new IllegalArgumentException("Expense not found with ID: " + expense.getId());
         }
+    }
+
+    public Map<Month, BigDecimal> getExpensesForPreviousMonths(Long userId, int previousMonths) {
+        Map<Month, BigDecimal> monthlyExpenses = new HashMap<>();
+        List<Expense> expenses = getExpensesByUserId(userId);
+
+        LocalDate dateOfCurrentMonth = LocalDate.now();
+        LocalDate dateOfFirstMonth = dateOfCurrentMonth.minusMonths(previousMonths);
+
+        for (int i = 0; i <  previousMonths; i++) {
+            LocalDate monthDate = dateOfFirstMonth.plusMonths(i);
+            Month month = Month.of(monthDate.getMonthValue());
+            monthlyExpenses.put(month, BigDecimal.ZERO);
+        }
+
+        for (Expense expense : expenses) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(expense.getDate());
+            LocalDate expenseDate = LocalDate.of(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1,
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            BigDecimal monthlyExpenseAmount = calculateMonthlyExpense(expense);
+
+            if (!expense.getPaymentFrequency().equals("One-off")) {
+                // If an expense has a frequency that is not "One-off", this expense also applies to all months following
+                // the month the expense was created
+                LocalDate iterationDate = expenseDate.withDayOfMonth(1);
+                while (!iterationDate.isAfter(dateOfCurrentMonth))  {
+                    if (!iterationDate.isBefore(dateOfFirstMonth.minusMonths(1))) {
+                        Month expenseMonth = Month.of(iterationDate.getMonthValue());
+                        monthlyExpenses.put(expenseMonth, monthlyExpenses.getOrDefault(expenseMonth, BigDecimal.ZERO).add(monthlyExpenseAmount));
+                    }
+                    iterationDate = iterationDate.plusMonths(1);
+                }
+            } else {
+                Month expenseMonth = Month.of(expenseDate.getMonthValue());
+                if (!expenseDate.isBefore(dateOfFirstMonth.minusMonths(1)) && !expenseDate.isAfter(dateOfCurrentMonth)) {
+                    monthlyExpenses.put(expenseMonth, monthlyExpenses.getOrDefault(expenseMonth, BigDecimal.ZERO).add(monthlyExpenseAmount));
+                }
+            }
+        }
+
+        // Print the month and corresponding expense value
+        for (Map.Entry<Month, BigDecimal> entry : monthlyExpenses.entrySet()) {
+            System.out.println("Month: " + entry.getKey() + ", Expense: " + entry.getValue());
+        }
+
+        return  monthlyExpenses;
+    }
+
+    private BigDecimal calculateMonthlyExpense(Expense expense) {
+        BigDecimal monthlyExpenseAmount = BigDecimal.ZERO;
+
+        switch (expense.getPaymentFrequency()) {
+            case "Weekly":
+                monthlyExpenseAmount = expense.getAmount().multiply(BigDecimal.valueOf(4));
+                break;
+            case"Biweekly":
+                monthlyExpenseAmount = expense.getAmount().multiply(BigDecimal.valueOf(2));
+                break;
+            case "Monthly":
+                monthlyExpenseAmount = expense.getAmount();
+                break;
+            case "One-off":
+                monthlyExpenseAmount = expense.getAmount();
+        }
+
+        return monthlyExpenseAmount;
     }
 }
