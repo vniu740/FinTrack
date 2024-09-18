@@ -1,13 +1,16 @@
 package org.vaadin.example.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.vaadin.example.model.Expense;
 import org.vaadin.example.repository.ExpenseRepository;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 /**
  * Service class for managing expense-related operations.
@@ -94,4 +97,43 @@ public class ExpenseService {
             throw new IllegalArgumentException("Expense not found with ID: " + expense.getId());
         }
     }
+
+  /**
+   * Retrieves a map of expenses in the previous x months for a particular user
+   *
+   * @param userId the ID of the user whose total expenses are to be calculated
+   * @param previousMonths the number of previous months that expenses should be retrieved for
+   * @return
+   */
+  public Map<Month, BigDecimal> getExpensesForPreviousMonths(Long userId, int previousMonths) {
+        Map<Month, BigDecimal> monthlyExpenses = new HashMap<>();
+        List<Expense> expenses = getExpensesByUserId(userId);
+
+        LocalDate dateOfCurrentMonth = LocalDate.now();
+        LocalDate dateOfFirstMonth = dateOfCurrentMonth.minusMonths(previousMonths);
+
+        for (int i = 0; i <  previousMonths; i++) {
+            LocalDate monthDate = dateOfFirstMonth.plusMonths(i);
+            Month month = Month.of(monthDate.getMonthValue());
+            monthlyExpenses.put(month, BigDecimal.ZERO);
+        }
+
+        for (Expense expense : expenses) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(expense.getDate());
+            LocalDate expenseDate = LocalDate.of(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1,
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            if (!expenseDate.isBefore(dateOfFirstMonth.minusMonths(1)) && !expenseDate.isAfter(dateOfCurrentMonth)) {
+                Month expenseMonth = Month.of(expenseDate.getMonthValue());
+                monthlyExpenses.put(expenseMonth, monthlyExpenses.getOrDefault(expenseMonth, BigDecimal.ZERO).add(expense.getAmount()));
+            }
+        }
+
+        return  monthlyExpenses;
+    }
+
 }
