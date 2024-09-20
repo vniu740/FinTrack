@@ -58,29 +58,19 @@ public class NetCashflowForecastView extends VerticalLayout {
         this.predictedExpenses = new HashMap<>();
         this.predictedCashflows = new LinkedHashMap<>();
 
-        Div chartContainer = new Div();
-        chartContainer.setClassName("chart-container");
-        Div cashflowContainer = new Div();
-        cashflowContainer.setClassName("chart-container");
+        
 
         configureExpenseChart();
         configureCashflowChart();
         updateExpenseChart();
         updateCashflowChart();
 
-        HorizontalLayout noteLayout = new HorizontalLayout();
-        noteLayout.add(expenseChart);//
-        noteLayout.setHeight("100%");
-        noteLayout.setWidth("100%");
+        Div expenseContainer = createChartContainer(expenseChart);
+        Div cashflowContainer = createChartContainer(cashflowChart);
 
-        HorizontalLayout cashflowLayout = new HorizontalLayout();
-        cashflowLayout.add(cashflowChart);//
-        cashflowLayout.setHeight("100%");
-        cashflowLayout.setWidth("100%");
-
-        chartContainer.add(noteLayout);
-        cashflowContainer.add(cashflowLayout);
-
+        HorizontalLayout chartLayout = new HorizontalLayout();
+        chartLayout.add(expenseContainer, cashflowContainer);
+        chartLayout.setWidth("100%");
 
         // Create a ComboBox for selecting months
         ComboBox<Integer> monthsComboBox = new ComboBox<>("Select Months", Arrays.asList(3, 6, 12));
@@ -91,11 +81,25 @@ public class NetCashflowForecastView extends VerticalLayout {
             updateCashflowChart();
         });
 
+
         add(new H1("Net Cashflow Forecast"), monthsComboBox);
-        add(chartContainer);
-        add(cashflowContainer);
+        add(chartLayout);
     }
 
+
+   private Div createChartContainer(ChartJs chart)  {
+    Div chartContainer = new Div();
+    chartContainer.setClassName("chart-container");
+
+    HorizontalLayout horizontalLayout = new HorizontalLayout();
+    horizontalLayout.add(chart);
+    horizontalLayout.setHeight("100%");
+    horizontalLayout.setWidth("100%");
+
+    chartContainer.add(horizontalLayout);
+
+    return chartContainer;
+   }
   /**
    * Configures the expense chart so that data can be added later on.
    */
