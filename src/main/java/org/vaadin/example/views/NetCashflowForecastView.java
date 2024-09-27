@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
@@ -287,7 +288,7 @@ private Map<Month, BigDecimal> getTotalPredictedExpenses() {
         if (ds instanceof BarDataset) {
             BarDataset dataset = (BarDataset) ds;
             for (int i = 0; i < 12; i++) {
-                Month futureMonth = LocalDate.now().plusMonths(i + 1).getMonth();
+                Month futureMonth = LocalDate.now().plusMonths(i + (long) 1).getMonth();
                 List<Double> data = dataset.getData();
                 totalPredictedExpense.put(futureMonth, totalPredictedExpense.getOrDefault(futureMonth, BigDecimal.ZERO).add(BigDecimal.valueOf(data.get(i))));
             }    
@@ -401,7 +402,7 @@ private Map<Month, BigDecimal> getTotalPredictedExpenses() {
      * @return rgba colour string
      */
     private String generateRgbaColour() {
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         int r = random.nextInt(256);  
         int g = random.nextInt(256); 
         int b = random.nextInt(256);
