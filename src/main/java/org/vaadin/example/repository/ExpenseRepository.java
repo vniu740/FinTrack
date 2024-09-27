@@ -3,6 +3,7 @@ package org.vaadin.example.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.vaadin.example.model.Budget;
 import org.vaadin.example.model.Expense;
 
 import java.math.BigDecimal;
@@ -51,4 +52,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      * @return a list of expenses associated with the specified budget ID
      */
     List<Expense> findByBudgetId(Long budgetId);
+
+
+    /**
+     * Finds a list of all the types of budgets associated with a user's expenses
+     * @param userId
+     * @return
+     */
+    @Query("SELECT DISTINCT e.budget.name FROM Expense e WHERE e.user.id = :userId")
+    List<String> getDistinctBudgets(@Param("userId") Long userId);
 }

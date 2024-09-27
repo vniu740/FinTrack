@@ -105,7 +105,7 @@ public class ExpenseService {
    * @param previousMonths the number of previous months that expenses should be retrieved for
    * @return
    */
-  public Map<Month, BigDecimal> getExpensesForPreviousMonths(Long userId, int previousMonths) {
+  public Map<Month, BigDecimal> getExpensesForPreviousMonths(Long userId, int previousMonths, String budgetName) {
         Map<Month, BigDecimal> monthlyExpenses = new HashMap<>();
         List<Expense> expenses = getExpensesByUserId(userId);
 
@@ -117,23 +117,34 @@ public class ExpenseService {
             Month month = Month.of(monthDate.getMonthValue());
             monthlyExpenses.put(month, BigDecimal.ZERO);
         }
-
-        for (Expense expense : expenses) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(expense.getDate());
-            LocalDate expenseDate = LocalDate.of(
+        if (!monthlyExpenses.isEmpty() || monthlyExpenses != null) {
+            for (Expense expense : expenses) {
+                if (expense.getBudget() != null && expense.getBudget().getName().equalsIgnoreCase(budgetName) || expense.getBudget() == null && budgetName.equals("no-budget")) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(expense.getDate());
+                    LocalDate expenseDate = LocalDate.of(
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH) + 1,
-                    calendar.get(Calendar.DAY_OF_MONTH)
-            );
+                    calendar.get(Calendar.DAY_OF_MONTH));
 
-            if (!expenseDate.isBefore(dateOfFirstMonth.minusMonths(1)) && !expenseDate.isAfter(dateOfCurrentMonth)) {
-                Month expenseMonth = Month.of(expenseDate.getMonthValue());
-                monthlyExpenses.put(expenseMonth, monthlyExpenses.getOrDefault(expenseMonth, BigDecimal.ZERO).add(expense.getAmount()));
+                    if (!expenseDate.isBefore(dateOfFirstMonth.minusMonths(1)) && !expenseDate.isAfter(dateOfCurrentMonth)) {
+                        Month expenseMonth = Month.of(expenseDate.getMonthValue());
+                        monthlyExpenses.put(expenseMonth, monthlyExpenses.getOrDefault(expenseMonth, BigDecimal.ZERO).add(expense.getAmount()));
+                    }
+                }
             }
+            return monthlyExpenses;
         }
-
-        return  monthlyExpenses;
+      return monthlyExpenses;  
     }
 
+  /**
+   * Returns a list of all the types of budgets associated with a user's expenses
+   *
+   * @param userId the ID of the user whose budgets will be found
+   * @return list of all the types of budgets associated with a user's expenses
+   */
+  public List<String> getAllDistinctBudgets(Long userId) {
+        return expenseRepository.getDistinctBudgets(userId);
+    }
 }
