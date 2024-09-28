@@ -95,7 +95,7 @@ public class ExpenseView extends VerticalLayout {
         formLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.END);
     
         totalExpensesValue = new H2("$ 0.00");
-        totalExpensesCard = createDashboardCard("Total Expenses for this Month", totalExpensesValue);
+        totalExpensesCard = createDashboardCard("Total Expenses", totalExpensesValue);
     
         H1 logo = new H1("Expenses");
     

@@ -268,8 +268,16 @@ public class NetCashflowForecastView extends VerticalLayout {
   private void predictNetCashflow() {
     Long userId = sessionService.getLoggedInUserId();
     BigDecimal totalIncomePerMonth = incomeService.getTotalIncomeAllMonths(userId);
-
     Map<Month, BigDecimal> predictedTotalExpenses = getTotalPredictedExpenses();
+    
+    if (totalIncomePerMonth.equals(BigDecimal.ZERO)) {
+        for (Map.Entry<Month, BigDecimal> entry : predictedTotalExpenses.entrySet()) {
+            predictedTotalExpenses.put(entry.getKey(), BigDecimal.ZERO);
+        }
+        predictedCashflows = predictedTotalExpenses;
+        return;
+    }
+
     for (Map.Entry<Month, BigDecimal> entry : predictedTotalExpenses.entrySet()) {
         BigDecimal predictedNetCashflow = totalIncomePerMonth.subtract(entry.getValue());
         predictedTotalExpenses.put(entry.getKey(), predictedNetCashflow);
@@ -314,9 +322,8 @@ private Map<Month, BigDecimal> getTotalPredictedExpenses() {
    * @param previousMonths the number of months that the predicted expenses should be based on
    * @return
    */
-  private Map<Month, BigDecimal> predictMonthlyExpensesBudget(
-      int previousMonths, String budgetName) {
-    Map<Month, BigDecimal> monthlyExpenses = new HashMap<>();
+  private Map<Month, BigDecimal> predictMonthlyExpensesBudget(int previousMonths, String budgetName) {
+    Map<Month, BigDecimal> monthlyExpenses = new EnumMap<>(Month.class);
     Long userId = sessionService.getLoggedInUserId();
 
     Map<Month, BigDecimal> monthlyPastExpensesBudget =
@@ -335,15 +342,18 @@ private Map<Month, BigDecimal> getTotalPredictedExpenses() {
         expensesList.add(entry.getValue());
       }
 
+      BigDecimal sum = expensesList.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+      BigDecimal averageExpense = sum.divide(new BigDecimal(expensesList.size()),  RoundingMode.HALF_UP);
+
       List<BigDecimal> changes = calculateChangesForConsecutiveMonths(expensesList);
 
       BigDecimal totalChange = changes.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-      BigDecimal averageChange = totalChange.divide(new BigDecimal(expensesList.size() - 1), RoundingMode.HALF_EVEN);
-
+      BigDecimal averageChange = totalChange.divide(changes.isEmpty() ? BigDecimal.ONE : new BigDecimal(changes.size()) , RoundingMode.HALF_EVEN);
+     
       for (int i = 1; i <= 12; i++) {
         Month futureMonth = LocalDate.now().plusMonths(i).getMonth();
-        BigDecimal predictedMonthExpense =monthlyPastExpensesBudget.getOrDefault(LocalDate.now().getMonth(), BigDecimal.ZERO)
-                .add((averageChange.multiply(new BigDecimal(i))));
+        BigDecimal predictedMonthExpense = averageExpense.add((averageChange.multiply(new BigDecimal(i))));
+
         monthlyExpenses.put(futureMonth, predictedMonthExpense.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : predictedMonthExpense);
       }
 
@@ -352,6 +362,7 @@ private Map<Month, BigDecimal> getTotalPredictedExpenses() {
 
     return monthlyExpenses; 
   }
+
 
   /**
    * Calculates the change in expenses between months
@@ -362,18 +373,25 @@ private Map<Month, BigDecimal> getTotalPredictedExpenses() {
     private List<BigDecimal> calculateChangesForConsecutiveMonths(List<BigDecimal> expensesList) {
         List<BigDecimal> changes = new ArrayList<>();
 
+        Month currentRealLifeMonth = LocalDate.now().getMonth();
+
         for (int i = 1; i < expensesList.size(); i++) {
             BigDecimal monthExpense = expensesList.get(i);
             BigDecimal previousMonthExpense = expensesList.get(i - 1);
 
-            BigDecimal currentChange;
-            if (previousMonthExpense.compareTo(BigDecimal.ZERO) != 0 && monthExpense.compareTo(BigDecimal.ZERO) != 0) {
-                currentChange = monthExpense.subtract(previousMonthExpense);
-            } else {
-                currentChange = BigDecimal.ZERO;
+            // Map the previous month (i - 1) to the corresponding month
+            Month previousMonth = Month.of(i % 12 + 1);  
+
+            // Skip if both current and previous expenses are zero OR
+            // if the previous month corresponds to the real-life current month and we are calculating based off 12 months
+            if (previousMonthExpense.compareTo(BigDecimal.ZERO) == 0 && monthExpense.compareTo(BigDecimal.ZERO) == 0 ||
+            (previousMonth == currentRealLifeMonth && expensesList.size() == 12)) {
+                continue;
             }
-        changes.add(currentChange);
+
+            changes.add(monthExpense.subtract(previousMonthExpense));
         }
+        
         return changes;
     }
 
