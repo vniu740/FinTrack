@@ -53,4 +53,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      * @return a list of expenses associated with the specified budget ID
      */
     List<Expense> findByBudgetId(Long budgetId);
+
+
+    /**
+     * Finds a list of all the types of budgets associated with a user's expenses
+     * @param userId
+     * @return
+     */
+    @Query("SELECT DISTINCT e.budget.name FROM Expense e WHERE e.user.id = :userId")
+    List<String> getDistinctBudgets(@Param("userId") Long userId);
 }
