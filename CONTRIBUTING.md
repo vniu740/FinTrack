@@ -31,7 +31,7 @@ By contributing, you agree that your contributions will be licensed under its [M
   - Purpose: Indicates that the issue or pull request involves backend development, such as server-side logic, database interactions, or APIs.
   - Example: Issue - "Create RESTful API for user authentication."
 - design
-  -   Purpose: Marks issues or pull requests focused on the design elements that are not directly functional, such as wireframes, UI mockups, or architectural diagrams.
+  - Purpose: Marks issues or pull requests focused on the design elements that are not directly functional, such as wireframes, UI mockups, or architectural diagrams.
   - Example: Issue - "Update wireframes to reflect new navigation flow."
 - feature
   - Purpose: Used for issues or pull requests that involve the development or modification of features or components in the application.
